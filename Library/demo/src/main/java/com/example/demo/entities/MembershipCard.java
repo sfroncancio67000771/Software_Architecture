@@ -2,31 +2,39 @@ package com.example.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.math.BigDecimal;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
-@Entity
 @Data
-@Table(name ="membership_cards")
+@Entity
+@Table(name = "membership_cards")
 public class MembershipCard {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false, unique = true)
     private User user;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 16) // Tarjeta con longitud fija
     private String cardNumber;
 
-     @Column(unique = true, nullable = false)
-    private BigDecimal balance = BigDecimal.ZERO;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal balance;
 
-     @Column(nullable = false)
-    private Boolean status = true;
+    @Column(nullable = false)
+    private boolean status = true;
 
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp date;
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private Timestamp createdDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = new Timestamp(System.currentTimeMillis());
+        if (this.balance == null) {
+            this.balance = BigDecimal.ZERO;
+        }
+    }
 }

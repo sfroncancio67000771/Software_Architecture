@@ -2,28 +2,32 @@ package com.example.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.web.JsonPath;
-
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 @Data
 @Entity
 @Table(name = "inventory")
 public class Inventory {
+
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "book_id",nullable = false)
+    @JoinColumn(name = "book_isbn", referencedColumnName = "isbn", nullable = false)
     private Book book;
 
     @Column(nullable = false)
     private Integer quantity;
 
     @Column(nullable = false)
-    private Boolean status = true;
+    private boolean status = true;  // Cambio de Boolean a boolean para evitar nulos
 
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp date;
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private Timestamp createdDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = new Timestamp(System.currentTimeMillis());
+    }
 }

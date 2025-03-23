@@ -2,15 +2,15 @@ package com.example.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 @Data
 @Entity
 @Table(name = "categories")
 public class Category {
+
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(unique = true, nullable = false)
@@ -19,6 +19,11 @@ public class Category {
     @Column(nullable = false)
     private Boolean status = true;
 
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp date;
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private Timestamp createdDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = new Timestamp(System.currentTimeMillis());
+    }
 }

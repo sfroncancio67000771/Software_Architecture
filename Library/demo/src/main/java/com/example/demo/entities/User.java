@@ -2,38 +2,43 @@ package com.example.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table (name = "users")
+@Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer id;
 
-    @Column(unique = true, nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;  // Alternativa: usar `email` como clave primaria.
+
+    @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    @Column(unique = true, nullable = true)
+    @Column(unique = true, nullable = false, length = 150)
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "role_id",nullable = false)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name ="country_id", nullable = false)
+    @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 
     @ManyToOne
-    @JoinColumn(name= "profession_id",nullable = false)
+    @JoinColumn(name = "profession_id", nullable = false)
     private Profession profession;
 
     @Column(nullable = false)
-    private Boolean status = true;
+    private boolean status = true;  // Se usa `boolean` en lugar de `Boolean`.
 
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp date;
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private Timestamp createdDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = new Timestamp(System.currentTimeMillis());
+    }
 }
